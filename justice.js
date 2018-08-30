@@ -49,6 +49,10 @@ function player_template(episode, video_link, link_without_ep_num, data) {
                         <div class="c-column">
                             <div class="cc-options">
                                 <div class="c-buttons cc-3a">
+                                    <a class="c-column c-control increment-user_rate" data-action="/api/v2/user_rates/:id/increment" data-method="post" data-remote="true" data-type="json">
+                                        <div class="icon"></div>
+                                        <div class="label">Просмотрено</div>
+                                    </a>
                                     <div class="c-column c-control show-options">
                                         <div class="icon"></div>
                                         <div class="label">Опции</div>
@@ -168,6 +172,13 @@ function start_content_script() {
         }
         console.log('URL:', url)
         $('.b-link_button.is-licensed').removeClass('is-licensed disabled').addClass('watch-online').text('Смотреть онлайн').attr('href', url).click(function() {location.href = url})
+
+        // get user rate to increment anime episodes
+        let user_rate_url = $('.item-add.increment').attr("data-action")
+        let user_rate_id = user_rate_url.slice(19, user_rate_url.lastIndexOf('/'))
+        let anime_name = location.href.slice(29)
+        chrome.storage.sync.set({[anime_name]: user_rate_id})
+        
     }
     else if(location.href.includes('video_online/new?anime_video')) {
         console.log('Upload video page!')
@@ -300,6 +311,31 @@ function start_content_script() {
 
             $('.c-control.prev').click(function() {goto_episode(parseInt(episode) - 1)})
             $('.c-control.next').click(function() {goto_episode(parseInt(episode) + 1)})
+
+            let anime_name = location.href.slice(34, location.href.indexOf('/video_online/'))
+            chrome.storage.sync.get([anime_name], function(user_rate) {
+                if (!user_rate) {
+                    console.error('User Rate ID не найден. Перейдите на главную страницу аниме. Добавьте ему статус "Смотрю".')
+                    return
+                }
+
+                let user_rate_id = user_rate[anime_name]
+                $('.c-column.c-control.increment-user_rate').attr('data-action', `/api/v2/user_rates/${user_rate_id}/increment`)
+            })
+            $('.c-column.c-control.increment-user_rate').click(function() {
+                // '.b-ajax' for loading icon
+                let icon = $('.c-column.c-control.increment-user_rate')
+                let start_loading = () => icon.addClass('b-ajax')
+                let finish_loading = () => icon.removeClass('b-ajax')
+
+                start_loading()
+                // todo: rewrite it to event-based
+                setTimeout(function() {
+                    finish_loading()
+                    $('.c-control.next').click()
+                }, 1000)
+            })
+
             let cc = $(cc_template())
             console.log('Writing cc...')
             $('.player-container').after(cc)
