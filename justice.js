@@ -159,7 +159,9 @@ function start_content_script() {
         console.log('Licensed anime page!')
         let url = location.href.replace('shikimori', 'play.shikimori') + '/video_online/'
         if($('.current-episodes').length) {
-            url += $('.current-episodes').text()
+            let current_episode_text = $('.current-episodes').text()
+            let next_episode = Number(current_episode_text)+1
+            url += String(next_episode)
         }
         else {
             url += '1'
