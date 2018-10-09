@@ -173,28 +173,32 @@ function start_content_script() {
         $('.b-link_button.is-licensed').removeClass('is-licensed disabled').addClass('watch-online').text('Смотреть онлайн').attr('href', url).click(function() {location.href = url})
     }
     else if(location.href.includes('video_online/new?anime_video')) {
-        console.log('Upload video page!')
-        $('form > .subheadline').text($('form > .subheadline').text() + ' (I Heard You Like License)')
-        $('.b-button.do-preview').click(function() {
-            $('.create-buttons > .buttons').empty().append($(`<div class="b-button" id="save-button">Работает. Сохранить</div>`))
-            $('#save-button').click(function() {
-                let req = {}
-                req['episode'] = $('#anime_video_episode')[0].value
-                req['name'] = location.href.substring(34, location.href.indexOf('/video_online/'))
-                req['team_title'] = $('#anime_video_author_name')[0].value
-                let types = {'субтитры': 'subtitles', 'оригинал': 'raw', 'озвучка': 'fandub'}
-                req['cc_type'] = types[$('#anime_video_kind option:selected').text()]
-                req['link'] = $('#anime_video_url')[0].value
-                console.log('request:')
-                console.log(req)
-                chrome.runtime.sendMessage(JSON.stringify({'action': 'post', 'link': 'http://licensecrush.ddns.net/add_title/', 'data': req}), function(resp) {
-                    resp = JSON.parse(resp)
-                    console.log('resp:', resp)
-                    if(resp['msg'] !== undefined) {
-                        alert(resp['msg'])
-                    }
+        chrome.runtime.sendMessage(JSON.stringify({'action': 'get', 'link': 'https://play.shikimori.org/animes/'+location.href.substring(34, location.href.indexOf('/video_online/'))+''}), function(resp) {
+            if($(resp).find('.b-errors > .subheadline').text() == 'Просмотр недоступен'){
+                console.log('Upload video page!')
+                $('form > .subheadline').text($('form > .subheadline').text() + ' (I Heard You Like License)')
+                $('.b-button.do-preview').click(function() {
+                    $('.create-buttons > .buttons').empty().append($(`<div class="b-button" id="save-button">Работает. Сохранить</div>`))
+                    $('#save-button').click(function() {
+                        let req = {}
+                        req['episode'] = $('#anime_video_episode')[0].value
+                        req['name'] = location.href.substring(34, location.href.indexOf('/video_online/'))
+                        req['team_title'] = $('#anime_video_author_name')[0].value
+                        let types = {'субтитры': 'subtitles', 'оригинал': 'raw', 'озвучка': 'fandub'}
+                        req['cc_type'] = types[$('#anime_video_kind option:selected').text()]
+                        req['link'] = $('#anime_video_url')[0].value
+                        console.log('request:')
+                        console.log(req)
+                        chrome.runtime.sendMessage(JSON.stringify({'action': 'post', 'link': 'http://licensecrush.ddns.net/add_title/', 'data': req}), function(resp) {
+                            resp = JSON.parse(resp)
+                            console.log('resp:', resp)
+                            if(resp['msg'] !== undefined) {
+                                alert(resp['msg'])
+                            }
+                        })
+                    })
                 })
-            })
+            }
         })
     }
     else if(location.href.includes('video_online') && $('.b-errors > .subheadline').length && ($('.b-errors > .subheadline').text() == 'Просмотр недоступен')) {
