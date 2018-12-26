@@ -40,7 +40,7 @@ function player_template(episode, video_link, link_without_ep_num, data) {
                                 </a>
                             </div>
                             <div class="cc-optional_controls">
-                                <a class="c-control upload" href="${link_without_ep_num}new?anime_video%5Banime_id%5D=36649&amp;anime_video%5Bepisode%5D=${episode}&amp;anime_video%5Bkind%5D=fandub&amp;anime_video%5Blanguage%5D=russian&amp;anime_video%5Bquality%5D=tv&amp;anime_video%5Bsource%5D=shikimori.org&amp;anime_video%5Bstate%5D=uploaded">
+                                <a class="c-control upload" href="${link_without_ep_num.replace('?no_redirect=1','')}new?anime_video%5Banime_id%5D=36649&amp;anime_video%5Bepisode%5D=${episode}&amp;anime_video%5Bkind%5D=fandub&amp;anime_video%5Blanguage%5D=russian&amp;anime_video%5Bquality%5D=tv&amp;anime_video%5Bsource%5D=shikimori.org&amp;anime_video%5Bstate%5D=uploaded">
                                     <div class="icon"></div>
                                     <div class="label">Загрузить</div>
                                 </a>
@@ -98,7 +98,7 @@ function empty_player_template(episode, link_without_ep_num, data) {
                 </div>
                 <div class="c-column">
                     <div class="cc-options">
-                        <div class="c-column cc-2a"><a class="c-control upload" href="${link_without_ep_num}new?anime_video%5Banime_id%5D=36456&amp;anime_video%5Bepisode%5D=${episode}&amp;anime_video%5Bkind%5D=fandub&amp;anime_video%5Blanguage%5D=russian&amp;anime_video%5Bquality%5D=tv&amp;anime_video%5Bsource%5D=shikimori.org&amp;anime_video%5Bstate%5D=uploaded">
+                        <div class="c-column cc-2a"><a class="c-control upload" href="${link_without_ep_num.replace('?no_redirect=1','')}new?anime_video%5Banime_id%5D=36456&amp;anime_video%5Bepisode%5D=${episode}&amp;anime_video%5Bkind%5D=fandub&amp;anime_video%5Blanguage%5D=russian&amp;anime_video%5Bquality%5D=tv&amp;anime_video%5Bsource%5D=shikimori.org&amp;anime_video%5Bstate%5D=uploaded">
                                 <div class="icon"></div>
                                 <div class="label">Загрузить</div>
                             </a></div>
@@ -162,7 +162,7 @@ function upload_link_template(link_without_ep_num, episode) {
 function start_content_script() {
     if($('.b-link_button.is-licensed').length) {
         console.log('Licensed anime page!')
-        let url = location.href.replace('shikimori', 'play.shikimori') + '/video_online/'
+        let url = location.href.replace('shikimori', 'play.shikimori') + '/video_online?no_redirect=1/'
         if($('.current-episodes').length) {
             url += $('.current-episodes').text()
         }
@@ -173,7 +173,7 @@ function start_content_script() {
         $('.b-link_button.is-licensed').removeClass('is-licensed disabled').addClass('watch-online').text('Смотреть онлайн').attr('href', url).click(function() {location.href = url})
     }
     else if(location.href.includes('video_online/new?anime_video')) {
-        chrome.runtime.sendMessage(JSON.stringify({'action': 'get', 'link': 'https://play.shikimori.org/animes/'+location.href.substring(34, location.href.indexOf('/video_online/'))+''}), function(resp) {
+        chrome.runtime.sendMessage(JSON.stringify({'action': 'get', 'link': 'https://play.shikimori.org/animes/'+location.href.substring(34, location.href.indexOf('/video_online/'))+'/video_online?no_redirect=1/'}), function(resp) {
             if($(resp).find('.b-errors > .subheadline').text() == 'Просмотр недоступен'){
                 console.log('Upload video page!')
                 $('form > .subheadline').text($('form > .subheadline').text() + ' (I Heard You Like License)')
@@ -203,13 +203,13 @@ function start_content_script() {
     }
     else if(location.href.includes('video_online') && $('.b-errors > .subheadline').length && ($('.b-errors > .subheadline').text() == 'Просмотр недоступен')) {
         console.log('Licensed anime video page!')
-        if(location.href.endsWith('/video_online')) {
+        if(location.href.endsWith('/video_online?no_redirect=1')) {
             location.href = location.href + '/1'
         }
-        else if(location.href.endsWith('/video_online/')) {
+        else if(location.href.endsWith('/video_online?no_redirect=1/')) {
             location.href = location.href + '1'
         }
-        else if(location.href.endsWith('/video_online/0')) {
+        else if(location.href.endsWith('/video_online?no_redirect=1/0')) {
             location.href = location.href.substr(0, location.href.length - 1) + '1'
         }
         $('.b-errors').remove()
