@@ -8,10 +8,12 @@
 ### Установка из официального магазина
 1. Для Firefox/Firefox для андроид: https://addons.mozilla.org/ru/firefox/addon/i-heard-you-like-license/
 2. Для Opera: находится на модерации
-3. Для если ссылки здесь нет, инструция по установке ниже
+3. Для Chrome: https://chrome.google.com/webstore/detail/i-heard-you-like-license/bbooifekkmnogclldfphokenjkapmnhe
+4. Для если ссылки здесь нет, инструция по установке ниже
 
-### Установка для Chrome
-1. Скачиваем архив .zip (версию не для edge) [отсюда](https://github.com/SebyakinAndrei/IHeardYouLikeLicense/releases)
+
+### Установка для Chrome (не из магазина)
+1. Скачиваем архив .zip [отсюда](https://github.com/SebyakinAndrei/IHeardYouLikeLicense/releases)
 2. Распаковываем его в любую удобную папку
 3. Заходим в настройки расширения своего браузера, находим и выставляем галочку "Режим разработчика"
 4. Далее находим появившуюся кнопку "Загрузить распакованное расширение" и нажимаем ее
