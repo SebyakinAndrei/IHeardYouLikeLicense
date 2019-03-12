@@ -162,18 +162,19 @@ function upload_link_template(link_without_ep_num, episode) {
 function start_content_script() {
     if($('.b-link_button.is-licensed').length) {
         console.log('Licensed anime page!')
-        let url = location.href.replace('shikimori', 'play.shikimori') + '/video_online?no_redirect=1/'
+        let url = location.href.replace('shikimori', 'play.shikimori') + '/video_online/'
         if($('.current-episodes').length) {
             url += $('.current-episodes').text()
         }
         else {
             url += '1'
         }
+        url += '?no_redirect=1'
         console.log('URL:', url)
         $('.b-link_button.is-licensed').removeClass('is-licensed disabled').addClass('watch-online').text('Смотреть онлайн').attr('href', url).click(function() {location.href = url})
     }
     else if(location.href.includes('video_online/new?anime_video')) {
-        chrome.runtime.sendMessage(JSON.stringify({'action': 'get', 'link': 'https://play.shikimori.org/animes/'+location.href.substring(34, location.href.indexOf('/video_online/'))+'/video_online?no_redirect=1/'}), function(resp) {
+        chrome.runtime.sendMessage(JSON.stringify({'action': 'get', 'link': 'https://play.shikimori.org/animes/'+location.href.substring(34, location.href.indexOf('/video_online/'))+'/video_online/1?no_redirect=1'}), function(resp) {
             if($(resp).find('.b-errors > .subheadline').text() == 'Просмотр недоступен'){
                 console.log('Upload video page!')
                 $('form > .subheadline').text($('form > .subheadline').text() + ' (I Heard You Like License)')
@@ -203,18 +204,19 @@ function start_content_script() {
     }
     else if(location.href.includes('video_online') && $('.b-errors > .subheadline').length && ($('.b-errors > .subheadline').text() == 'Просмотр недоступен')) {
         console.log('Licensed anime video page!')
-        if(location.href.endsWith('/video_online?no_redirect=1')) {
-            location.href = location.href + '/1'
+        if(location.href.endsWith('/video_online')) {
+            location.href = location.href + '/1?no_redirect=1'
         }
-        else if(location.href.endsWith('/video_online?no_redirect=1/')) {
-            location.href = location.href + '1'
+        else if(location.href.endsWith('/video_online/')) {
+            location.href = location.href + '1?no_redirect=1'
         }
-        else if(location.href.endsWith('/video_online?no_redirect=1/0')) {
-            location.href = location.href.substr(0, location.href.length - 1) + '1'
+        else if(location.href.endsWith('/video_online/0')) {
+            location.href = location.href.substr(0, location.href.length - 1) + '1?no_redirect=1'
         }
-        $('.b-errors').remove()
+        $('.player-container').remove()
+        $('.cc.block').remove()
         let split_url = location.href.split('/')
-        let name = split_url[split_url.length - 3], episode = split_url[split_url.length - 1]
+        let name = split_url[split_url.length - 3], episode = split_url[split_url.length - 1].replace('?no_redirect=1','')
         chrome.runtime.sendMessage(JSON.stringify({'action': 'get', 'link': 'http://licensecrush.ddns.net/anime_episodes_info/'+name+'/'+episode+'/'}), function(data) {
             console.log(data)
             data = JSON.parse(data)
@@ -294,7 +296,7 @@ function start_content_script() {
                 episode = episode.toString()
                 last_studio = $('.video-variant-group .b-video_variant.active .video-author').text()
                 console.log('Выбранный перевод',last_studio , $('.video-variant-group.active .b-video_variant.active .video-author'))
-                window.history.pushState(`episode-${episode}`, `Эпизод ${episode} / I heard you like license`, link_without_ep_num.substring(26) + episode)
+                window.history.pushState(`episode-${episode}`, `Эпизод ${episode} / I heard you like license`, link_without_ep_num.substring(26) + episode+'?no_redirect=1')
                 $('.c-control.episode-num > input').attr('value', episode)
                 $('.c-control.upload').attr('href', upload_link_template(link_without_ep_num, episode))
 
