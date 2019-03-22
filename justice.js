@@ -646,18 +646,19 @@ function alternative_source(mal_title_id, current_episode){
                     let t_url = smotretanime_domain_fix(translations.data.translations[i].embedUrl),
                     summary = translations.data.translations[i].authorsSummary,
                     type = translations.data.translations[i].type
+                    let t_arr = ['smotretanime.ru', t_url, summary]
 
                     if(!summary) {
                          summary = 'Неизвестный'
                     }
                     if(type == 'subRu') {
-                        array[1].subtitles.push(['smotretanime.ru', t_url, summary])
+                        array[1].subtitles.push(t_arr)
                     }
                     else if(type == 'raw') {
-                        array[1].raw.push(['smotretanime.ru', t_url, summary])
+                        array[1].raw.push(t_arr)
                     }
                     else if(type == 'voiceRu') {
-                        array[1].fandub.push(['smotretanime.ru', t_url, summary])
+                        array[1].fandub.push(t_arr)
                     }
                 }
                 console.log(array)
